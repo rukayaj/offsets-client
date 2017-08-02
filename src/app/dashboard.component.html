@@ -1,0 +1,28 @@
+<div *ngIf="developments">
+  <div class="row">
+    <div class="col-8">
+      <data-table id="developments-grid" headerTitle="Developments" [items]="developments" [itemCount]="developmentsCount" >
+        <data-table-column [property]="'id'" [header]="'ID'" [sortable]="true" [resizable]="false"></data-table-column>
+        <data-table-column [header]="'Year'" [sortable]="true" [resizable]="false">        
+            <template #dataTableCell let-item="item">
+                <span>{{ item.properties['year'] }}</span>
+            </template>
+        </data-table-column>
+        <data-table-column
+            [property]="'id'"
+            [header]="'&nbsp;'"
+            [resizable]="false">
+            <template #dataTableHeader let-item="item">
+                <span style="color: rgb(232, 0, 0)">Active</span>
+            </template>
+            <template #dataTableCell let-item="item">
+                <span style="color: grey">
+                  <a [routerLink]="['/detail', item.id]"  class="button">View</a>
+                </span>
+            </template>
+        </data-table-column>
+      </data-table>
+    </div>
+    <div class="col-4"><div leaflet style="height: 300px;" [leafletOptions]="options" [leafletLayers]="layers"></div></div>
+  </div>
+</div>
