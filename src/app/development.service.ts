@@ -4,10 +4,6 @@ import { Headers, Http } from '@angular/http';
 import 'rxjs/add/operator/toPromise';
 import { Development } from './development';
 
-import { DropdownQuestion } from './question-dropdown';
-import { QuestionBase }     from './question-base';
-import { TextboxQuestion }  from './question-textbox';
-
 @Injectable()
 export class DevelopmentService {
   private developmentUrl = 'http://172.16.6.250:8000/developments'; 
@@ -61,47 +57,4 @@ export class DevelopmentService {
       .then(res => res.json().data as Development)
       .catch(this.handleError);
   }
-  
-  getQuestions(): Promise<QuestionBase<any>[]> {
-    return this.http
-      .options(this.developmentUrl)
-      .toPromise()
-      .then(response => {
-        // Iterate over the metadata and return a questionbase[]
-        let questions: QuestionBase<any>[];
-        let postMetadata = response.json()['actions'].POST; 
-        for(let metadata in postMetadata) {
-          let item = postMetadata[metadata];
-          let i = 0;
-          if(!item['read_only']) {
-            i++;
-            
-            switch(item['type']) {
-              case 'integer': {
-                questions.push(new TextboxQuestion({
-                  key: metadata,
-                  label: item['label'],
-                  value: '',
-                  required: item['required'],
-                  order: i
-                }));
-                break;
-              }
-              case 'choice': {                      
-                questions.push(new DropdownQuestion({
-                  key: metadata,
-                  label: item['label'],
-                  options: item['choices'],
-                  order: i
-                }));
-                break;
-              }
-            }
-          }
-        }
-        return questions;
-      })
-      .catch(this.handleError);
-      
-  }  
 }

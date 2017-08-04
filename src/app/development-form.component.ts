@@ -3,7 +3,7 @@ import { Component, Input, OnInit } from '@angular/core';
 import { ActivatedRoute, ParamMap } from '@angular/router';
 import { Location }                 from '@angular/common';
 import 'rxjs/add/operator/switchMap';
-import * as L from 'leaflet';
+//import * as L from 'leaflet';
 
 import { Development } from './development';
 import { DevelopmentService } from './development.service';
@@ -16,6 +16,8 @@ import { QuestionControlService }    from './question-control.service';
 
 import { DropdownQuestion } from './question-dropdown';
 import { TextboxQuestion }  from './question-textbox';
+import { GeoJsonQuestion }  from './question-geojson';
+
 
 @Component({
   templateUrl: './development-form.component.html',
@@ -32,9 +34,9 @@ export class DevelopmentFormComponent implements OnInit {
   types = [];
   
   // Leaflet properties
-  layers: L.Layer[];
-	layersControl: any;
-	options = {zoom: 7};
+  //layers: L.Layer[];
+	//layersControl: any;
+	//options = {zoom: 7, center: [51.505, -0.09]};
   
   // The constructor which runs when this class is initialised
   constructor(
@@ -44,16 +46,13 @@ export class DevelopmentFormComponent implements OnInit {
     private qcs: QuestionControlService
   ) {
     // Initialise leaflet with the openstreetmap baselayer
-    this.layers = [L.tileLayer('http://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { maxZoom: 18, attribution: '...' })];
+    //this.layers = [L.tileLayer('http://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { maxZoom: 18, attribution: '...' })];
     // this.questions = developmentService.getQuestions();
   }
   
   ngOnInit(): void {
-    // Get the types to populate the form
-    // this.developmentService.getDevelopmentOptions().then(newobj => this.types = newobj['actions'].POST.type.choices);
-    
+    // Populate the form based on the metadata retrieved from OPTIONS request to API
     this.developmentService.getDevelopmentOptions().then(metadata => {
-      // Iterate over the metadata and return a questionbase[]
       let postMetadata = metadata['actions'].POST; 
       for(let md in postMetadata) {
         let item = postMetadata[md];
@@ -61,26 +60,12 @@ export class DevelopmentFormComponent implements OnInit {
         if(!item['read_only']) {
           i++;
           
+          // Beautifully the item returned from DRF can go straight into TextboxQuestion object with this one addition
+          item['key'] = md; 
           switch(item['type']) {
-            case 'integer': {
-              this.questions.push(new TextboxQuestion({
-                key: md,
-                label: item['label'],
-                value: '',
-                required: item['required'],
-                order: i
-              }));
-              break;
-            }
-            case 'choice': {                      
-              this.questions.push(new DropdownQuestion({
-                key: md,
-                label: item['label'],
-                options: item['choices'],
-                order: i
-              }));
-              break;
-            }
+            case 'integer': { this.questions.push(new TextboxQuestion(item)); break; }
+            case 'choice':  { this.questions.push(new DropdownQuestion(item)); break; }
+            case 'geojson': { this.questions.push(new GeoJsonQuestion(item)); break; }
           }
         }
       }
