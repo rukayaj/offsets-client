@@ -8,9 +8,6 @@ import * as L from 'leaflet';
 import { Development } from './development';
 import { DevelopmentService } from './development.service';
 
-
-import { DataTableResource } from 'angular-4-data-table-bootstrap-4';
-
 @Component({
   selector: 'dashboard',
   templateUrl: './dashboard.component.html',

@@ -6,7 +6,8 @@ import { RouterModule }   from '@angular/router';
 import { AppComponent }        from './app.component';
 import { DashboardComponent }  from './dashboard.component';
 import { DevelopmentDetailComponent } from './development-detail.component';
-//import { DevelopmentsComponent }     from './developments.component';
+import { DevelopmentFormComponent } from './development-form.component';
+import { DynamicFormQuestionComponent } from './dynamic-form-question.component';
 import { DevelopmentService }         from './development.service';
 
 import { AppRoutingModule }     from './app-routing.module';
@@ -17,11 +18,11 @@ import { platformBrowserDynamic }           from '@angular/platform-browser-dyna
 
 import { LeafletModule } from '@asymmetrik/angular2-leaflet';
 
-import { DataTableModule } from 'angular-4-data-table-bootstrap-4';
-
 const platform: PlatformRef = platformBrowserDynamic();
 
 import {NgbModule} from '@ng-bootstrap/ng-bootstrap';
+
+import { ReactiveFormsModule } from '@angular/forms';
 
 
 @NgModule({
@@ -31,13 +32,15 @@ import {NgbModule} from '@ng-bootstrap/ng-bootstrap';
     AppRoutingModule,
     HttpModule,
     LeafletModule,
-    NgbModule.forRoot(),
-    DataTableModule
+    NgbModule.forRoot(), 
+    ReactiveFormsModule
   ],
   declarations: [
     AppComponent,
     DashboardComponent,
     DevelopmentDetailComponent,
+    DevelopmentFormComponent,
+    DynamicFormQuestionComponent
     //HeroesComponent
   ],
   providers: [DevelopmentService],
