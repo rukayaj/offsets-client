@@ -11,7 +11,7 @@
     </select>
       
     <label class="custom-file" *ngSwitchCase="'geojson'">
-      <input type="file" [id]="question.key" class="custom-file-input">
+      <input type="file" [id]="question.key" class="custom-file-input" (change)="onChange($event, $layers, $options)" #geojson>
       <span class="custom-file-control"></span>
     </label>
     
@@ -21,5 +21,5 @@
 </div>
   
 <div class="row" *ngIf="question.controlType=='geojson'"><div class="col-sm-10 offset-sm-2">
-    <div leaflet style="height: 300px;" [leafletOptions]="options" [leafletLayers]="layers"></div>
+    <div leaflet style="height: 300px;" [leafletOptions]="options" [leafletLayers]="layers" [leafletCenter]="center"></div>
 </div></div>

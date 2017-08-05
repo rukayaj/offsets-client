@@ -66,11 +66,22 @@ export class DevelopmentFormComponent implements OnInit {
             case 'integer': { this.questions.push(new TextboxQuestion(item)); break; }
             case 'choice':  { this.questions.push(new DropdownQuestion(item)); break; }
             case 'geojson': { this.questions.push(new GeoJsonQuestion(item)); break; }
+            case 'foreign key': { 
+              this.developmentService.getForeignKeyValues(item['endpoint']).then(values => {
+                item['choices'] = values['results'].map(function(obj) {
+                  return {'value': obj['id'], 'display_name': obj['name']}
+                });
+                
+                this.questions.push(new DropdownQuestion(item));
+                this.form = this.qcs.toFormGroup(this.questions);
+              });
+              break; 
+            }
           }
         }
       }
-      this.form = this.qcs.toFormGroup(this.questions);
-    });
+      
+  }).then(() => { this.form = this.qcs.toFormGroup(this.questions); });
     
     this.form = this.qcs.toFormGroup(this.questions);
     

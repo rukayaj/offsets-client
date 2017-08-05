@@ -6,7 +6,8 @@ import { Development } from './development';
 
 @Injectable()
 export class DevelopmentService {
-  private developmentUrl = 'http://172.16.6.250:8000/developments'; 
+  private apiUrl = 'http://127.0.0.1:8000'; 
+  private developmentUrl = this.apiUrl + '/developments'; 
   private headers = new Headers({'Content-Type': 'application/json'});
   
   constructor(private http: Http) { }
@@ -39,6 +40,15 @@ export class DevelopmentService {
       .put(url, JSON.stringify(development), {headers: this.headers})
       .toPromise()
       .then(() => development)
+      .catch(this.handleError);
+  }
+  
+  getForeignKeyValues(endpoint: String): Promise<Object[]> {
+    const url = `${this.apiUrl}/${endpoint}`;
+    return this.http
+      .get(url)
+      .toPromise()
+      .then(response => response.json())
       .catch(this.handleError);
   }
   
