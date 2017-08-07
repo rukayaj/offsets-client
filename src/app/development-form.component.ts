@@ -24,8 +24,7 @@ import { GeoJsonQuestion }  from './question-geojson';
   providers: [ QuestionControlService,  DevelopmentService]
 })
 export class DevelopmentFormComponent implements OnInit {
-  @Input() questions: QuestionBase<any>[] = [];
-  
+  questions: QuestionBase<any>[] = new Array();
   form: FormGroup;
   payLoad = '';
   
@@ -33,10 +32,6 @@ export class DevelopmentFormComponent implements OnInit {
   @Input() development: Development;
   types = [];
   
-  // Leaflet properties
-  //layers: L.Layer[];
-	//layersControl: any;
-	//options = {zoom: 7, center: [51.505, -0.09]};
   
   // The constructor which runs when this class is initialised
   constructor(
@@ -45,10 +40,14 @@ export class DevelopmentFormComponent implements OnInit {
     private location: Location,
     private qcs: QuestionControlService
   ) {
-    // Initialise leaflet with the openstreetmap baselayer
-    //this.layers = [L.tileLayer('http://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { maxZoom: 18, attribution: '...' })];
-    // this.questions = developmentService.getQuestions();
+    //this.questions = developmentService.simpleGetQs();
+    //developmentService.simpleGetQs().subscribe((questions) => { this.questions = questions; this.form = this.qcs.toFormGroup(this.questions); });
+    let temp = new Array();
+    this.form = this.qcs.toFormGroup(temp);
+    console.log('called once');
+    //developmentService.simpleGetQs().subscribe(questions => { this.questions = questions; this.form = this.qcs.toFormGroup(this.questions); });
   }
+  
   
   ngOnInit(): void {
     // Populate the form based on the metadata retrieved from OPTIONS request to API
@@ -85,20 +84,22 @@ export class DevelopmentFormComponent implements OnInit {
     
     this.form = this.qcs.toFormGroup(this.questions);
     
-    
-    /*this.route.paramMap
-      .switchMap((params: ParamMap) => this.developmentService.getDevelopment(+params.get('id')))
-      .subscribe(development => { 
-          console.log(this.developmentService.getDevelopmentOptions());
-          let polygon = L.geoJSON(development); // This wouldn't be possible if development wasn't a valid geojson object 
-          let centroid = polygon.getBounds().getCenter();
-          this.layers.push(polygon);
-          this.options['center'] = centroid;
-          
-          // Used to populate the form
-          this.development = development; 
-        });*/
   }
+  
+  /*
+  ngOnInit(): void {
+    
+    this.developmentService.getDevelopmentQuestions().then(questions => {
+      let temp = questions;
+      this.questions = temp;
+      console.log(temp);
+      this.form = this.qcs.toFormGroup(this.questions);
+    });
+    //this.developmentService.simpleGetQs().subscribe((questions) => { 
+      //console.log(questions); this.questions = questions; 
+      //this.form = this.qcs.toFormGroup(questions); 
+    //});
+  }*/
   
   goBack(): void {
     this.location.back();
@@ -106,12 +107,12 @@ export class DevelopmentFormComponent implements OnInit {
   
   onSubmit() {
     // TODO post this back to API
-    console.log(JSON.stringify(this.form.value));
+    //console.log(JSON.stringify(this.form.value));
   }
   
   save(): void {
-    this.developmentService.update(this.development)
-      .then(() => this.goBack());
+    //this.developmentService.update(this.development)
+    //  .then(() => this.goBack());
   }
 }
 

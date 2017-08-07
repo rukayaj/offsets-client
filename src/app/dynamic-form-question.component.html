@@ -11,8 +11,9 @@
     </select>
       
     <label class="custom-file" *ngSwitchCase="'geojson'">
-      <input type="file" [id]="question.key" class="custom-file-input" (change)="onChange($event, $layers, $options)" #geojson>
+      <input type="file" [id]="question.key" class="custom-file-input" (change)="onChange($event, $layers, $options)">
       <span class="custom-file-control"></span>
+      <div *ngIf="showLeaflet" class="alert alert-danger">Geojson file plotted on map below. Upload a new file to override. </div>
     </label>
     
     <small class="form-text text-muted" *ngIf="!isValid">{{question.label}} is required</small>
@@ -20,6 +21,6 @@
   </div> 
 </div>
   
-<div class="row" *ngIf="question.controlType=='geojson'"><div class="col-sm-10 offset-sm-2">
+<div class="row" *ngIf="question.controlType=='geojson'"><div *ngIf="showLeaflet" [@fadeInOut] class="col-sm-10 offset-sm-2">
     <div leaflet style="height: 300px;" [leafletOptions]="options" [leafletLayers]="layers" [leafletCenter]="center"></div>
 </div></div>

@@ -8,6 +8,7 @@ import { DashboardComponent }  from './dashboard.component';
 import { DevelopmentDetailComponent } from './development-detail.component';
 import { DevelopmentFormComponent } from './development-form.component';
 import { DynamicFormQuestionComponent } from './dynamic-form-question.component';
+//import { DynamicFormComponent } from './dynamic-form.component';
 import { DevelopmentService }         from './development.service';
 
 import { AppRoutingModule }     from './app-routing.module';
@@ -23,7 +24,7 @@ const platform: PlatformRef = platformBrowserDynamic();
 import {NgbModule} from '@ng-bootstrap/ng-bootstrap';
 
 import { ReactiveFormsModule } from '@angular/forms';
-
+import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 
 @NgModule({
   imports: [
@@ -33,15 +34,16 @@ import { ReactiveFormsModule } from '@angular/forms';
     HttpModule,
     LeafletModule,
     NgbModule.forRoot(), 
-    ReactiveFormsModule
+    ReactiveFormsModule,
+    BrowserAnimationsModule
   ],
   declarations: [
     AppComponent,
     DashboardComponent,
     DevelopmentDetailComponent,
     DevelopmentFormComponent,
-    DynamicFormQuestionComponent
-    //HeroesComponent
+    DynamicFormQuestionComponent,
+    //DynamicFormComponent
   ],
   providers: [DevelopmentService],
   bootstrap: [AppComponent]
