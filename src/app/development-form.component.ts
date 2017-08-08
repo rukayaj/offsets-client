@@ -40,18 +40,13 @@ export class DevelopmentFormComponent implements OnInit {
     private location: Location,
     private qcs: QuestionControlService
   ) {
-    //this.questions = developmentService.simpleGetQs();
-    //developmentService.simpleGetQs().subscribe((questions) => { this.questions = questions; this.form = this.qcs.toFormGroup(this.questions); });
-    let temp = new Array();
-    this.form = this.qcs.toFormGroup(temp);
-    console.log('called once');
-    //developmentService.simpleGetQs().subscribe(questions => { this.questions = questions; this.form = this.qcs.toFormGroup(this.questions); });
+    this.form = this.qcs.toFormGroup(this.questions);
   }
   
   
   ngOnInit(): void {
     // Populate the form based on the metadata retrieved from OPTIONS request to API
-    this.developmentService.getDevelopmentOptions().then(metadata => {
+    /*this.developmentService.getDevelopmentOptions().then(metadata => {
       let postMetadata = metadata['actions'].POST; 
       for(let md in postMetadata) {
         let item = postMetadata[md];
@@ -59,7 +54,7 @@ export class DevelopmentFormComponent implements OnInit {
         if(!item['read_only']) {
           i++;
           
-          // Beautifully the item returned from DRF can go straight into TextboxQuestion object with this one addition
+          // Fuck you angular. Why can't this go in the fucking service. What the fuck.
           item['key'] = md; 
           switch(item['type']) {
             case 'integer': { this.questions.push(new TextboxQuestion(item)); break; }
@@ -79,35 +74,25 @@ export class DevelopmentFormComponent implements OnInit {
           }
         }
       }
-      
-  }).then(() => { this.form = this.qcs.toFormGroup(this.questions); });
-    
-    this.form = this.qcs.toFormGroup(this.questions);
-    
-  }
-  
-  /*
-  ngOnInit(): void {
+    }).then(() => { this.form = this.qcs.toFormGroup(this.questions); });*/
     
     this.developmentService.getDevelopmentQuestions().then(questions => {
-      let temp = questions;
-      this.questions = temp;
-      console.log(temp);
+      this.questions = questions;
       this.form = this.qcs.toFormGroup(this.questions);
     });
-    //this.developmentService.simpleGetQs().subscribe((questions) => { 
-      //console.log(questions); this.questions = questions; 
-      //this.form = this.qcs.toFormGroup(questions); 
-    //});
-  }*/
-  
+  }
+    
   goBack(): void {
     this.location.back();
   }
   
   onSubmit() {
     // TODO post this back to API
-    //console.log(JSON.stringify(this.form.value));
+    //this.developmentService.update(this.development) {
+    //  console.log(JSON.stringify(this.form.value));
+    //}
+    console.log(this.form.value);
+    this.developmentService.create(this.form.value);
   }
   
   save(): void {

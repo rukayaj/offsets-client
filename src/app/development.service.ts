@@ -7,6 +7,7 @@ import { Development } from './development';
 import { QuestionBase }              from './question-base';
 import { QuestionControlService }    from './question-control.service';
 
+import { MultiDropdownQuestion } from './question-multidropdown';
 import { DropdownQuestion } from './question-dropdown';
 import { TextboxQuestion }  from './question-textbox';
 import { GeoJsonQuestion }  from './question-geojson';
@@ -17,11 +18,15 @@ import { Observable } from 'rxjs/Rx';
 
 @Injectable()
 export class DevelopmentService {
-  private apiUrl = 'http://127.0.0.1:8000'; 
+  //private apiUrl = 'http://127.0.0.1:8000'; 
+  private apiUrl = 'http://172.16.6.250:8000'; 
   private developmentUrl = this.apiUrl + '/developments'; 
   private headers = new Headers({'Content-Type': 'application/json'});
+  developmentOptions = {};
   
-  constructor(private http: Http) { }
+  constructor(private http: Http) {
+    this.getDevelopmentQuestions().then(result => this.developmentOptions = result);
+  }
 
   getDevelopments(): Promise<Development[]> {
     return this.http.get(this.developmentUrl)
@@ -107,74 +112,53 @@ export class DevelopmentService {
       });
   }
   
-  getDevelopmentQuestions(): Promise<QuestionBase<any>[]> {
+  getDevelopmentQuestions(): Promise<QuestionBase<any>[]> {    
     return this.http
       .options(this.developmentUrl)
       .toPromise()
       .then(response => { 
-        /*
-        let questions: QuestionBase<any>[] = [
-          new DropdownQuestion({
-            key: 'brave',
-            label: 'Bravery Rating',
-            options: [
-              {key: 'solid',  value: 'Solid'},
-              {key: 'great',  value: 'Great'},
-              {key: 'good',   value: 'Good'},
-              {key: 'unproven', value: 'Unproven'}
-            ],
-            order: 3
-          }),
-     
-          new TextboxQuestion({
-            key: 'firstName',
-            label: 'First name',
-            value: 'Bombasto',
-            required: true,
-            order: 1
-          }),
-        ];
-        return questions;
-        */
         let metadata = response.json();
         let postMetadata = metadata['actions'].POST; 
         var questions = []; 
-        
+        var promises = []; 
+
         for(let md in postMetadata) {
           let item = postMetadata[md];
-          let i = 0;
-          if(!item['read_only']) {
-            i++;
-            
-            
+          if(!item['read_only']) {  
             item['key'] = md; 
+            item['is_multi'] = null;
             switch(item['type']) {
               case 'integer': { questions.push(new TextboxQuestion(item)); break; }
               case 'choice':  { questions.push(new DropdownQuestion(item)); break; }
               case 'geojson': { questions.push(new GeoJsonQuestion(item)); break; }
-              case 'foreign key': { 
-                this.getForeignKeyValues(item['endpoint']).then(values => {
+              case 'foreign key - multi': { 
+                let newPromise = this.getForeignKeyValues(item['endpoint']).then(values => {
+                  item['is_multi'] = true;
                   item['choices'] = values['results'].map(function(obj) {
                     return {'value': obj['id'], 'display_name': obj['name']}
                   });
                   
-                  questions.push(new DropdownQuestion(item));
+                  questions.push(new MultiDropdownQuestion(item));
+                  return questions;
                 }).catch(this.handleError);
+                
+                promises.push(newPromise); // A promise to be resolved before returning
                 break; 
               }
             }
           }
         }
         
-        return questions;
-      }).catch(this.handleError);
+        // Will this actually work for forms with more than one foreign key?
+        return Promise.all(promises).then(results => results[results.length - 1]);
+      })
   }
   
-  create(name: string): Promise<Development> {
+  create(development: object): Promise<Development> {
     return this.http
-      .post(this.developmentUrl, JSON.stringify({name: name}), {headers: this.headers})
+      .post(this.developmentUrl, development, {headers: this.headers})
       .toPromise()
       .then(res => res.json().data as Development)
-      .catch(this.handleError);
+      .catch(this.handleError); // TODO show server error back at the form
   }
 }

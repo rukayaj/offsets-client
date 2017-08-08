@@ -9,15 +9,19 @@
     <select [id]="question.key" *ngSwitchCase="'dropdown'" [formControlName]="question.key" class="form-control" >
       <option *ngFor="let opt of question.choices" [value]="opt.value">{{opt.display_name}}</option>
     </select>
+    
+    <select [id]="question.key" *ngSwitchCase="'multidropdown'" multiple [formControlName]="question.key" class="form-control" >
+      <option *ngFor="let opt of question.choices" [value]="opt.value">{{opt.display_name}}</option>
+    </select>
       
     <label class="custom-file" *ngSwitchCase="'geojson'">
       <input type="file" [id]="question.key" class="custom-file-input" (change)="onChange($event, $layers, $options)">
       <span class="custom-file-control"></span>
-      <div *ngIf="showLeaflet" class="alert alert-danger">Geojson file plotted on map below. Upload a new file to override. </div>
+      <div *ngIf="showLeaflet" class="alert alert-warning">Geojson file plotted on map below. Upload a new file to override. </div>
     </label>
     
-    <small class="form-text text-muted" *ngIf="!isValid">{{question.label}} is required</small>
-    <small class="form-text text-muted" *ngIf="!isValid">{{question.help_text}}</small>
+    <small class="form-text text-muted">{{question.help_text}}</small>
+    <small class="form-text text-muted alert alert-danger" *ngIf="!isValid">{{question.label}} is required</small>
   </div> 
 </div>
   

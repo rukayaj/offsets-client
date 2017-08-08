@@ -50,11 +50,20 @@ export class DynamicFormQuestionComponent {
       // For mysterious reasons it doesn't work if you do this.layers.push
       this.layers = [this.layers[0], polygon];
       this.center = centroid;
+      
+      //this.form.controls[this.question.key].setValue(polygonObj['features'][0]['geometry']['coordinates'][0]);
+      //this.form.controls[this.question.key].setValue(polygon.toGeoJSON());
+      let coords = polygonObj['features'][0]['geometry']['coordinates'][0];
+      let wkt = "POLYGON((" + coords.map(function(x) { return x.join(" ") }).join(',') + "))";
+      this.form.controls[this.question.key].setValue(wkt);
     }.bind(this);
     
     // Actually reading the file
     reader.readAsText(files[0]);
   }
   
-  get isValid() { return this.form.controls[this.question.key].valid; }
+  get isValid() { 
+    return true;
+    //return this.form.controls[this.question.key].valid; 
+  }
 }

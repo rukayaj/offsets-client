@@ -23,7 +23,7 @@ export class DashboardComponent implements OnInit {
   // Leaflet properties
   layers: L.Layer[];
 	layersControl: any;
-	options = {zoom: 7};
+	options = {zoom: 5};
   
   // The constructor which runs when this class is initialised
   constructor(
