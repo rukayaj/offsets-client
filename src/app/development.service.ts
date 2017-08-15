@@ -18,8 +18,8 @@ import { Observable } from 'rxjs/Rx';
 
 @Injectable()
 export class DevelopmentService {
-  //private apiUrl = 'http://127.0.0.1:8000'; 
-  private apiUrl = 'http://172.16.6.250:8000'; 
+  private apiUrl = 'http://127.0.0.1:8000'; 
+  //private apiUrl = 'http://172.16.6.250:8000'; 
   private developmentUrl = this.apiUrl + '/developments'; 
   private headers = new Headers({'Content-Type': 'application/json'});
   developmentOptions = {};

@@ -1,9 +1,8 @@
 <div class="row">
   <div class="col-12">
     <div *ngIf="development">
-      <h2>{{development.properties.year}} details!</h2>
-      <div><label>id: </label>{{development.properties.id}}</div>
-      
+      <h2>{{ development.properties.year }} <small>(ID {{ development.properties.province }} {{ development.id  }})</small></h2>
+      <p>{{ development.properties.permits }}
       <div leaflet style="height: 300px;" [leafletOptions]="options" [leafletLayers]="layers">
       </div>
             

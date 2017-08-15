@@ -33,7 +33,7 @@
            <tr *ngFor="let dev of developments">
               <td>{{ dev.id }}</td>
               <td>{{ dev.properties.year }}</td>
-              <td>Filler</td>
+              <td>{{ dev.properties.province }}</td>
               <td><a [routerLink]="['/detail', dev.id]"  class="button">View</a></td>
            </tr>
          </tbody>

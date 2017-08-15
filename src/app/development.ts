@@ -1,12 +1,13 @@
 export class Development {
   id: number;
-  type: string;
   geometry: object;
   properties: GeoProperty;
+  type: string;
 }
 
 export class GeoProperty {
-  id: number;
   year: number;
+  province: string;
   permits: number[];
+  type: string;
 }
