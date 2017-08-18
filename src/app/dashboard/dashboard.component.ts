@@ -5,8 +5,8 @@ import { Location }                 from '@angular/common';
 import 'rxjs/add/operator/switchMap';
 import * as L from 'leaflet';
 
-import { Development } from './development';
-import { DevelopmentService } from './development.service';
+import { Development } from '../interfaces/development';
+import { DevelopmentService } from '../services/development.service';
 
 @Component({
   selector: 'dashboard',

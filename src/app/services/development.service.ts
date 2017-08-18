@@ -2,15 +2,15 @@ import { Injectable } from '@angular/core';
 import { Headers, Http } from '@angular/http';
 
 import 'rxjs/add/operator/toPromise';
-import { Development } from './development';
+import { Development, Area } from '../interfaces/development';
 
-import { QuestionBase }              from './question-base';
-import { QuestionControlService }    from './question-control.service';
+import { QuestionBase }              from '../dynamic-form/question-base';
+import { QuestionControlService }    from '../dynamic-form/question-control.service';
 
-import { MultiDropdownQuestion } from './question-multidropdown';
-import { DropdownQuestion } from './question-dropdown';
-import { TextboxQuestion }  from './question-textbox';
-import { GeoJsonQuestion }  from './question-geojson';
+import { MultiDropdownQuestion } from '../dynamic-form/question-multidropdown';
+import { DropdownQuestion } from '../dynamic-form/question-dropdown';
+import { TextboxQuestion }  from '../dynamic-form/question-textbox';
+import { GeoJsonQuestion }  from '../dynamic-form/question-geojson';
 import 'rxjs/add/operator/map'
 import { Observable } from 'rxjs/Rx';
 
@@ -26,6 +26,14 @@ export class DevelopmentService {
   
   constructor(private http: Http) {
     this.getDevelopmentQuestions().then(result => this.developmentOptions = result);
+  }
+  
+  getAreas(): Promise<Area[]> {
+    return this.http.get('http://127.0.0.1:8000/geospatial-biodiversity/areas')
+           .toPromise()
+           .then(response => response.json())
+           //.then(function(response) { console.log(response); return JSON.stringify(response.json(); })
+           .catch(this.handleError);
   }
 
   getDevelopments(): Promise<Development[]> {
@@ -74,42 +82,6 @@ export class DevelopmentService {
       .toPromise()
       .then(response => response.json())
       .catch(this.handleError);
-  }
-  
-  
-  simpleGetQs(): Observable<QuestionBase<any>[]> {
-    return this.http
-      .options(this.developmentUrl)
-      .map(response => { 
-        let metadata = response.json();
-        let postMetadata = metadata['actions'].POST; 
-        var questions = []; 
-        
-        for(let md in postMetadata) {
-          let item = postMetadata[md];
-          
-          if(!item['read_only']) {            
-            item['key'] = md; 
-            switch(item['type']) {
-              case 'integer': { questions.push(new TextboxQuestion(item)); break; }
-              case 'choice':  { questions.push(new DropdownQuestion(item)); break; }
-              case 'geojson': { questions.push(new GeoJsonQuestion(item)); break; }
-              case 'foreign key': { 
-                this.getForeignKeyValues(item['endpoint']).then(values => {
-                  item['choices'] = values['results'].map(function(obj) {
-                    return {'value': obj['id'], 'display_name': obj['name']}
-                  });
-                  
-                  questions.push(new DropdownQuestion(item));
-                }).catch(this.handleError);
-                break; 
-              }
-            }
-          }
-        }
-        
-        return questions;
-      });
   }
   
   getDevelopmentQuestions(): Promise<QuestionBase<any>[]> {    

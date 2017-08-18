@@ -5,8 +5,9 @@ import { Location }                 from '@angular/common';
 import 'rxjs/add/operator/switchMap';
 import * as L from 'leaflet';
 
-import { Development } from './development';
-import { DevelopmentService } from './development.service';
+import { Development } from '../interfaces/development';
+import { DevelopmentService } from '../services/development.service';
+import { BGISService } from '../services/bgis.service';
 
 @Component({
   selector: 'development-detail',
@@ -25,6 +26,7 @@ export class DevelopmentDetailComponent implements OnInit {
   // The constructor which runs when this class is initialised
   constructor(
     private developmentService: DevelopmentService,
+    private bgisService: BGISService,
     private route: ActivatedRoute,
     private location: Location
   ) {
@@ -36,13 +38,23 @@ export class DevelopmentDetailComponent implements OnInit {
     this.route.paramMap
       .switchMap((params: ParamMap) => this.developmentService.getDevelopment(+params.get('id')))
       .subscribe(development => { 
-          let polygon = L.geoJSON(development); // This wouldn't be possible if development wasn't a valid geojson object 
+          var polygon = L.geoJSON(development); // This wouldn't be possible if development wasn't a valid geojson object 
           let centroid = polygon.getBounds().getCenter();
-          this.layers.push(polygon);
+          //this.layers.push(polygon); - Can't do this, must do it below... 
           this.options['center'] = centroid;
           
           // Used to populate the form
-          this.development = development; 
+          this.development = development;
+          
+          this.developmentService.getAreas().then( areas => {
+            let features = areas['results']['features'];  
+            let areaPolygon = L.geoJSON(features[4]); 
+            //this.layers.push(areaPolygon); - Why can't one do this??? Screw you, Angular. 
+            this.layers = [
+              L.tileLayer('http://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { maxZoom: 18, attribution: '...' }),
+              polygon, areaPolygon
+            ];
+          });
         });
   }
   

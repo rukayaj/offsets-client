@@ -2,6 +2,12 @@ import { Component, Input, OnInit } from '@angular/core';
 import { FormGroup }        from '@angular/forms';
 
 import { QuestionBase }     from './question-base';
+import { QuestionControlService }    from '../dynamic-form/question-control.service';
+
+import { MultiDropdownQuestion } from '../dynamic-form/question-multidropdown';
+import { DropdownQuestion } from '../dynamic-form/question-dropdown';
+import { TextboxQuestion }  from '../dynamic-form/question-textbox';
+import { GeoJsonQuestion }  from '../dynamic-form/question-geojson';
 
 
 import { ActivatedRoute, ParamMap } from '@angular/router';
@@ -10,6 +16,7 @@ import 'rxjs/add/operator/switchMap';
 import * as L from 'leaflet';
 import { trigger, state, style, animate, transition } from '@angular/animations';
 
+import { BGISService } from '../services/bgis.service';  
 @Component({
   selector: 'df-question',
   templateUrl: './dynamic-form-question.component.html',
@@ -33,7 +40,13 @@ export class DynamicFormQuestionComponent {
   showLeaflet = false;
   
   @Input() question: QuestionBase<any>;
+  @Input() questions: QuestionBase<any>[];
   @Input() form: FormGroup;
+  
+  constructor(
+    private bgisService: BGISService
+  ) {
+  }
   
   // Called when the geojson file is loaded
   onChange(event): void {
@@ -56,6 +69,25 @@ export class DynamicFormQuestionComponent {
       let coords = polygonObj['features'][0]['geometry']['coordinates'][0];
       let wkt = "POLYGON((" + coords.map(function(x) { return x.join(" ") }).join(',') + "))";
       this.form.controls[this.question.key].setValue(wkt);
+      
+      // Get information about the area from the BGIS API
+      this.bgisService.getVegTypes(coords).then(results => {
+        console.log(results['results']);
+        console.log(this.questions);
+        
+        var promises = []; 
+        
+        results['results'].forEach((item, index) => {
+            let newItem = {
+              'value': item.value,
+              'key': 'json_' + index,
+              'label': item.value + ' area in ha',
+              'required': false,
+              'help_text': item.value + ' (' + item.attributes.CHANGE_REF + ')'
+            }
+            //this.questions.push(new TextboxQuestion(newItem));
+        });
+      });
     }.bind(this);
     
     // Actually reading the file

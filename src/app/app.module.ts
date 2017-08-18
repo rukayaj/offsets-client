@@ -4,12 +4,13 @@ import { FormsModule }    from '@angular/forms';
 import { RouterModule }   from '@angular/router';
 
 import { AppComponent }        from './app.component';
-import { DashboardComponent }  from './dashboard.component';
-import { DevelopmentDetailComponent } from './development-detail.component';
-import { DevelopmentFormComponent } from './development-form.component';
-import { DynamicFormQuestionComponent } from './dynamic-form-question.component';
+import { DashboardComponent }  from './dashboard/dashboard.component';
+import { DevelopmentDetailComponent } from './development/development-detail.component';
+import { DevelopmentFormComponent } from './development/development-form.component';
+import { DynamicFormQuestionComponent } from './dynamic-form/dynamic-form-question.component';
 //import { DynamicFormComponent } from './dynamic-form.component';
-import { DevelopmentService }         from './development.service';
+import { DevelopmentService }         from './services/development.service';
+import { BGISService }         from './services/bgis.service';
 
 import { AppRoutingModule }     from './app-routing.module';
 import { HttpModule } from "@angular/http";
@@ -45,7 +46,7 @@ import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
     DynamicFormQuestionComponent,
     //DynamicFormComponent
   ],
-  providers: [DevelopmentService],
+  providers: [DevelopmentService, BGISService],
   bootstrap: [AppComponent]
 })
 export class AppModule {
