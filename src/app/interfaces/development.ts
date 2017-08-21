@@ -10,6 +10,7 @@ export class DevelopmentGeoProperty {
   province: string;
   permits: number[];
   type: string;
+  info: object;
 }
 
 export class Area {
@@ -22,13 +23,13 @@ export class Area {
 export class Offset {
   id: number;
   geometry: object;
-  properties: DevelopmentGeoProperty;
+  properties: OffsetGeoProperty;
   type: string;
 }
 
 export class OffsetGeoProperty {
   year: number;
   province: string;
-  permits: number[];
   type: string;
+  duration: string;
 }

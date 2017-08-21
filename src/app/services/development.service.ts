@@ -2,7 +2,7 @@ import { Injectable } from '@angular/core';
 import { Headers, Http } from '@angular/http';
 
 import 'rxjs/add/operator/toPromise';
-import { Development, Area } from '../interfaces/development';
+import { Development, Area, Offset } from '../interfaces/development';
 
 import { QuestionBase }              from '../dynamic-form/question-base';
 import { QuestionControlService }    from '../dynamic-form/question-control.service';
@@ -21,11 +21,25 @@ export class DevelopmentService {
   private apiUrl = 'http://127.0.0.1:8000'; 
   //private apiUrl = 'http://172.16.6.250:8000'; 
   private developmentUrl = this.apiUrl + '/developments'; 
+  private offsetUrl = this.apiUrl + '/offsets'
   private headers = new Headers({'Content-Type': 'application/json'});
   developmentOptions = {};
   
   constructor(private http: Http) {
     this.getDevelopmentQuestions().then(result => this.developmentOptions = result);
+  }
+  
+  getOffsets(devID?: number): Promise<Object> {
+    let url = this.offsetUrl
+    if(devID) {
+      url += '?development=' + devID;
+    }
+    
+    return this.http.get(url)
+           .toPromise()
+           .then(response => response.json())
+           //.then(function(response) { console.log(response); return JSON.stringify(response.json(); })
+           .catch(this.handleError);
   }
   
   getAreas(): Promise<Area[]> {
@@ -84,6 +98,54 @@ export class DevelopmentService {
       .catch(this.handleError);
   }
   
+  getOffsetQuestions(): Promise<QuestionBase<any>[]> {    
+    return this.http
+      .options(this.offsetUrl)
+      .toPromise()
+      .then(response => { 
+        let metadata = response.json();
+        let postMetadata = metadata['actions'].POST; 
+        var questions = []; 
+        var promises = []; 
+
+        for(let md in postMetadata) {
+          let item = postMetadata[md];
+          if(!item['read_only']) {  
+            item['key'] = md; 
+            item['order'] = 0;
+            item['is_multi'] = null;
+                        
+            switch(item['type']) {
+              case 'integer': { questions.push(new TextboxQuestion(item)); break; }
+              case 'choice':  { questions.push(new DropdownQuestion(item)); break; }
+              case 'geojson': { 
+                item['order'] = 1;
+                questions.push(new GeoJsonQuestion(item)); 
+                break; 
+              }
+              case 'foreign key - multi': { 
+                let newPromise = this.getForeignKeyValues(item['endpoint']).then(values => {
+                  item['is_multi'] = true;
+                  item['choices'] = values['results'].map(function(obj) {
+                    return {'value': obj['id'], 'display_name': obj['name']}
+                  });
+                  
+                  questions.push(new MultiDropdownQuestion(item));
+                  return questions;
+                }).catch(this.handleError);
+                
+                promises.push(newPromise); // A promise to be resolved before returning
+                break; 
+              }
+            }
+          }
+        }
+        
+        // Will this actually work for forms with more than one foreign key?
+        return Promise.all(promises).then(results => results[results.length - 1]);
+      })
+  }
+  
   getDevelopmentQuestions(): Promise<QuestionBase<any>[]> {    
     return this.http
       .options(this.developmentUrl)
@@ -98,11 +160,17 @@ export class DevelopmentService {
           let item = postMetadata[md];
           if(!item['read_only']) {  
             item['key'] = md; 
+            item['order'] = 0;
             item['is_multi'] = null;
+                        
             switch(item['type']) {
               case 'integer': { questions.push(new TextboxQuestion(item)); break; }
               case 'choice':  { questions.push(new DropdownQuestion(item)); break; }
-              case 'geojson': { questions.push(new GeoJsonQuestion(item)); break; }
+              case 'geojson': { 
+                item['order'] = 1;
+                questions.push(new GeoJsonQuestion(item)); 
+                break; 
+              }
               case 'foreign key - multi': { 
                 let newPromise = this.getForeignKeyValues(item['endpoint']).then(values => {
                   item['is_multi'] = true;
@@ -132,5 +200,13 @@ export class DevelopmentService {
       .toPromise()
       .then(res => res.json().data as Development)
       .catch(this.handleError); // TODO show server error back at the form
+  }
+  
+  delete(id: number): Promise<void> {
+    const url = `${this.developmentUrl}/${id}`;
+    return this.http.delete(url, {headers: this.headers})
+      .toPromise()
+      .then(() => null)
+      .catch(this.handleError);
   }
 }

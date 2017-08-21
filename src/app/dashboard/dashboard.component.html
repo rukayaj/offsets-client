@@ -34,7 +34,10 @@
               <td>{{ dev.id }}</td>
               <td>{{ dev.properties.year }}</td>
               <td>{{ dev.properties.province }}</td>
-              <td><a [routerLink]="['/detail', dev.id]"  class="button">View</a></td>
+              <td>
+                <a [routerLink]="['/detail', dev.id]"  class="btn btn-sm btn-outline-primary"><i class="fa fa-eye" aria-hidden="true"> </i> View</a>
+                <button class="btn btn-sm btn-outline-danger" (click)="open(content, dev.id)"><i class="fa fa-trash-o" aria-hidden="true"> </i> Delete</button>
+              </td>
            </tr>
          </tbody>
       </table>
@@ -42,3 +45,16 @@
     <div class="col-4"><div leaflet style="height: 300px;" [leafletOptions]="options" [leafletLayers]="layers"></div></div>
   </div>
 </div>
+<ng-template #content let-c="close" let-d="dismiss">
+  <div class="modal-header">
+    <h4 class="modal-title">Are you sure?</h4>
+    <button type="button" class="close" aria-label="Close" (click)="d('Cross click')">
+      <span aria-hidden="true">&times;</span>
+    </button>
+  </div>
+  <!--<div class="modal-body"></div>-->
+  <div class="modal-footer">
+    <button type="button" class="btn btn-sm btn-outline-danger" (click)="delete(devID); c('Close click')"><i class="fa fa-trash-o" aria-hidden="true"> </i> Delete</button>
+    <button type="button" class="btn btn-sm btn-outline-dark" (click)="c('Close click')">Close</button>
+  </div>
+</ng-template>

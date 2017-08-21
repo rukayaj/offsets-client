@@ -1,17 +1,64 @@
-<div class="row">
-  <div class="col-12">
-    <div *ngIf="development">
-      <h2>{{ development.properties.year }} <small>(ID {{ development.properties.province }} {{ development.id  }})</small></h2>
-      <p>{{ development.properties.permits }}
-      <div leaflet style="height: 300px;" [leafletOptions]="options" [leafletLayers]="layers">
-      </div>
-            
-      <div>
-        <label>year: </label>
-        <input [(ngModel)]="development.properties.year" placeholder="year"/>
-      </div>
-      <button (click)="goBack()">Back</button>
-      <button (click)="save()">Save</button>
+<div *ngIf="development">
+  <div class="row">
+    <div class="col-md-12">
+      <h2>{{ development.properties.year }} {{ development.properties.get_type_display }} development in development.info.province <small>(ID {{ development.properties.province }} {{ development.id  }})</small></h2>
+      <p>Permits: <span *ngFor="let opt of development.properties.permits_display" >
+        <span class="btn btn-sm btn-info">{{ opt }}</span> </span></p>  
+      <hr>
     </div>
   </div>
+  <div class="row">
+    <div class="col-md-12">
+      <div leaflet style="height: 300px;" [leafletOptions]="options" [leafletLayers]="layers"></div>
+    </div>
+  </div>
+  <div class="row">
+    <div class="col-md-5">
+      <h3>This development area contains</h3>      
+      <table class="table">
+        <thead>
+          <tr>
+            <th scope="col">Type</th>
+            <th scope="col">Name</th>
+            <th scope="col">Status</th>
+            <th scope="col">Area (ha)</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let key of objectKeys(development.properties.info)">
+            <td>{{ development.properties.info[key].type }}</td>
+            <td>{{ key }}</td> 
+            <td>{{ development.properties.info[key].status }}</td>
+            <td>{{ development.properties.info[key].area }}</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+    <div class="col-md-7">
+      <h3>Offsets</h3>
+      <div *ngIf="offsets">
+        <span *ngFor="let offset of offsets.features" >
+          {{ offset.properties.get_type_display }}
+        </span>
+      </div>  
+    </div>
+  </div>
+  <button (click)="goBack()">Back</button>
+  <button (click)="save()">Save</button>
+  
+  <ng-template #content let-c="close" let-d="dismiss">
+  <div class="modal-header">
+    <h4 class="modal-title">Add new offset</h4>
+    <button type="button" class="close" aria-label="Close" (click)="d('Cross click')">
+      <span aria-hidden="true">&times;</span>
+    </button>
+  </div>
+  <div class="modal-body">
+  
+  </div>
+  <div class="modal-footer">
+    <button type="button" class="btn btn-sm btn-outline-danger" (click)="delete(devID); c('Close click')"><i class="fa fa-trash-o" aria-hidden="true"> </i> Delete</button>
+    <button type="button" class="btn btn-sm btn-outline-dark" (click)="c('Close click')">Close</button>
+  </div>
+</ng-template>
 </div>
