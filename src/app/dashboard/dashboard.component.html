@@ -1,25 +1,19 @@
 <div *ngIf="developments">
   <div class="row">
     <div class="col-12">
-       <nav class="navbar navbar-toggleable-md navbar-light">
-        <button class="navbar-toggler navbar-toggler-right" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
-          <span class="navbar-toggler-icon"></span>
-        </button>
-
-        <div class="collapse navbar-collapse" id="navbarSupportedContent">
-          <form class="form-inline my-2 my-lg-0">
+        <div style="overflow: auto; margin-bottom: 15px; padding: 15px; background-color: #e3f2fd;">
+          <form class="form-inline my-2 my-lg-0" style="float: left;">
             <input class="form-control mr-sm-2" type="text" placeholder="Search">
             <button class="btn my-2 my-sm-0 btn-outline-primary" type="submit">Search</button>
           </form>
-          <span class="navbar-text ml-auto">
+          <span style="display: block; float: right;">
             <a class="btn my-2 my-sm-0 btn-outline-primary" [routerLink]="['/create']"> <i class="fa fa-plus " aria-hidden="true"> </i> Add development</a>
           </span>
         </div>
-      </nav>
     </div>
   </div>
   <div class="row">
-    <div class="col-8">
+    <div class="col-md-8">
       <table class="table">
         <thead>
            <tr>
@@ -42,7 +36,7 @@
          </tbody>
       </table>
     </div>
-    <div class="col-4"><div leaflet style="height: 300px;" [leafletOptions]="options" [leafletLayers]="layers"></div></div>
+    <div class="col-md-4"><div leaflet style="height: 300px;" [leafletOptions]="options" [leafletLayers]="layers"></div></div>
   </div>
 </div>
 <ng-template #content let-c="close" let-d="dismiss">

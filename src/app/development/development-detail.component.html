@@ -35,7 +35,7 @@
       </table>
     </div>
     <div class="col-md-7">
-      <h3>Offsets</h3>
+      <h3>Offsets <button class="btn btn-sm btn-outline-success" (click)="open(content)"><i class="fa fa-plus" aria-hidden="true"> </i> Add new</button></h3>
       <div *ngIf="offsets">
         <span *ngFor="let offset of offsets.features" >
           {{ offset.properties.get_type_display }}
@@ -46,19 +46,21 @@
   <button (click)="goBack()">Back</button>
   <button (click)="save()">Save</button>
   
-  <ng-template #content let-c="close" let-d="dismiss">
-  <div class="modal-header">
-    <h4 class="modal-title">Add new offset</h4>
-    <button type="button" class="close" aria-label="Close" (click)="d('Cross click')">
-      <span aria-hidden="true">&times;</span>
-    </button>
+  <div>
+    <ng-template #content let-c="close" let-d="dismiss">
+      <div class="modal-header">
+        <h4 class="modal-title">Add new offset</h4>
+        <button type="button" class="close" aria-label="Close" (click)="d('Cross click')">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body"><div class="container"><div class="row">
+        <dynamic-form *ngIf="questions" [questions]="questions"></dynamic-form>
+      </div></div></div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-sm btn-outline-danger" (click)="delete(devID); c('Close click')"><i class="fa fa-trash-o" aria-hidden="true"> </i> Delete</button>
+        <button type="button" class="btn btn-sm btn-outline-dark" (click)="c('Close click')">Close</button>
+      </div>
+    </ng-template>
   </div>
-  <div class="modal-body">
-  
-  </div>
-  <div class="modal-footer">
-    <button type="button" class="btn btn-sm btn-outline-danger" (click)="delete(devID); c('Close click')"><i class="fa fa-trash-o" aria-hidden="true"> </i> Delete</button>
-    <button type="button" class="btn btn-sm btn-outline-dark" (click)="c('Close click')">Close</button>
-  </div>
-</ng-template>
 </div>

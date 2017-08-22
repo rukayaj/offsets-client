@@ -9,7 +9,10 @@ import { Development, Offset } from '../interfaces/development';
 import { DevelopmentService } from '../services/development.service';
 import { BGISService } from '../services/bgis.service';
 
+import { QuestionBase }              from '../dynamic-form/question-base';
+import { QuestionControlService }    from '../dynamic-form/question-control.service';
 
+import {NgbModal, ModalDismissReasons} from '@ng-bootstrap/ng-bootstrap';
 
 @Component({
   selector: 'development-detail',
@@ -21,6 +24,8 @@ export class DevelopmentDetailComponent implements OnInit {
   @Input() development: Development;
   offsets: Object;
   objectKeys = Object.keys;
+  
+  questions: QuestionBase<any>[];// = [];
 
   
   // Leaflet properties
@@ -34,11 +39,18 @@ export class DevelopmentDetailComponent implements OnInit {
     private developmentService: DevelopmentService,
     private bgisService: BGISService,
     private route: ActivatedRoute,
-    private location: Location
+    private location: Location,
+    private modalService: NgbModal
   ) {
     // Initialise leaflet with the openstreetmap baselayer
     this.layers = [L.tileLayer('http://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { maxZoom: 18, attribution: '...' })];
     this.offsetLayers = [L.tileLayer('http://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { maxZoom: 18, attribution: '...' })];
+    
+    
+    this.developmentService.getDevelopmentQuestions().then(questions => {
+      this.questions = questions.sort((a, b) => a.order - b.order);
+      //console.log(this.questions);
+    });
   }
   
   ngOnInit(): void {
@@ -49,7 +61,7 @@ export class DevelopmentDetailComponent implements OnInit {
           let centroid = polygon.getBounds().getCenter();
           this.layers.push(polygon); //- Can't do this, must do it below... 
           this.options['center'] = centroid;
-          console.log(centroid);
+          //console.log(centroid);
           
           this.developmentService.getForeignKeyValues('permits').then(values => {
             let permitOptions = [];
@@ -83,7 +95,7 @@ export class DevelopmentDetailComponent implements OnInit {
             if(offsets['count'] > 0) {
               this.offsets = offsets['results'];
               //console.log(this.offsets);
-              console.log(JSON.stringify(this.offsets));
+              //console.log(JSON.stringify(this.offsets));
               let offsetPolygons = L.geoJSON(JSON.parse(JSON.stringify(this.offsets)), {
                 style: function(feature) {
                    return {
@@ -104,11 +116,7 @@ export class DevelopmentDetailComponent implements OnInit {
               ];
               
               let centroid = offsetPolygons.getBounds().getCenter();
-              console.log(centroid);
-              //this.layers.push(polygon); //- Can't do this, must do it below... 
               this.options['center'] = centroid;
-              console.log(this.layers);
-              
             }
           });
         });
@@ -118,6 +126,14 @@ export class DevelopmentDetailComponent implements OnInit {
     this.location.back();
   }
   
+  open(content) {
+    this.modalService.open(content, {'size': 'lg'}).result.then((result) => {
+      //this.closeResult = `Closed with: ${result}`;
+    }, (reason) => {
+      //this.closeResult = `Dismissed ${this.getDismissReason(reason)}`;
+    });
+  }
+
   save(): void {
     this.developmentService.update(this.development)
       .then(() => this.goBack());
