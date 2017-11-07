@@ -13,30 +13,31 @@
     </div>
   </div>
   <div class="row">
-    <div class="col-md-8">
+    <div class="col-md-12"><div class="col-md-12"><div leaflet style="height: 300px;" [leafletOptions]="options" [leafletLayers]="layers"></div></div></div>
+    <div class="col-md-12">
       <table class="table">
         <thead>
            <tr>
-              <th scope="col">ID</th>
+              <th scope="col">Reference #</th>
               <th scope="col">Year</th>
               <th scope="col">Province</th>
+              <th scope="col">Title</th>
+              <th scope="col">&nbsp;</th>
               <th scope="col">&nbsp;</th>
            </tr>
          </thead>
          <tbody>
            <tr *ngFor="let dev of developments">
-              <td>{{ dev.id }}</td>
-              <td>{{ dev.properties.year }}</td>
+              <td>{{ dev.properties.reference_no }}</td>
+              <td>{{ dev.properties.date_issued }}</td> <!-- TODO change to year format -->
               <td>{{ dev.properties.province }}</td>
-              <td>
-                <a [routerLink]="['/detail', dev.id]"  class="btn btn-sm btn-outline-primary"><i class="fa fa-eye" aria-hidden="true"> </i> View</a>
-                <button class="btn btn-sm btn-outline-danger" (click)="open(content, dev.id)"><i class="fa fa-trash-o" aria-hidden="true"> </i> Delete</button>
-              </td>
+              <td>{{ dev.properties.application_title }}</td>
+              <td><a [routerLink]="['/detail', dev.id]"  class="btn btn-sm btn-outline-primary"><i class="fa fa-eye" aria-hidden="true"> </i> View</a></td>
+              <td><button class="btn btn-sm btn-outline-danger" (click)="open(content, dev.id)"><i class="fa fa-trash-o" aria-hidden="true"> </i> Delete</button></td>
            </tr>
          </tbody>
       </table>
     </div>
-    <div class="col-md-4"><div leaflet style="height: 300px;" [leafletOptions]="options" [leafletLayers]="layers"></div></div>
   </div>
 </div>
 <ng-template #content let-c="close" let-d="dismiss">

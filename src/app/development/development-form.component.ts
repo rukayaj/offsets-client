@@ -39,17 +39,11 @@ import { BGISService } from '../services/bgis.service';
   ]
 })
 export class DevelopmentFormComponent implements OnInit {
-  questions: QuestionBase<any>[] = new Array();
-  addFormQuestions: QuestionBase<any>[] = new Array();
-  form: FormGroup;
-  addForm: FormGroup;
-  showAddForm = false;
+  questions: QuestionBase<any>[];
   payLoad = '';
   
   // I wonder what the @ symbol signifies?
   @Input() development: Development;
-  types = [];
-  additionalQuestions = {};
   
   
   // The constructor which runs when this class is initialised
@@ -60,22 +54,19 @@ export class DevelopmentFormComponent implements OnInit {
     private qcs: QuestionControlService,
     private bgisService: BGISService
   ) {
-    this.form = this.qcs.toFormGroup(this.questions);
-    this.addForm = this.qcs.toFormGroup(this.questions);
+    this.developmentService.getDevelopmentQuestions().then(questions => {
+      this.questions = questions.sort((a, b) => a.order - b.order);
+    });
   }
   
   ngOnInit(): void {
-    this.developmentService.getDevelopmentQuestions().then(questions => {
-      this.questions = questions.sort((a, b) => a.order - b.order);
-      this.form = this.qcs.toFormGroup(this.questions);
-    });
   }
     
   goBack(): void {
     this.location.back();
   }
   
-  onSubmit() {
+  onSubmitF(event) {
     // additionalQuestions contains all of the additional area qs retrieved from BGIS
     // Including status etc. We need to add area to this from what was entered on the form
     // Then delete the submitted form value and add the original additionalQuestions
@@ -83,23 +74,23 @@ export class DevelopmentFormComponent implements OnInit {
     // Oh and for some reason we can't just add the additional qs to the original form
     // Had to make a new form called addForm or else when you submit the original form the 
     // original values get lost. WTF is all I can say.
-    console.log(this.form.value);
-    console.log(this.addForm.value);
+    console.log(event);
+    console.log(event['form']);
     
-    //let submitValues = this.form.value;
-    this.form.value['info'] = {}; // This should really come from the API... 
-    for(let key in this.addForm.value) {
+    var submitValues = event['form'];
+    submitValues['info'] = {}; // This should really come from the API... 
+    for(let key in event['addForm']) {
       if(key.startsWith('json_')) {
         let newKey = key.substring(5);
-        this.additionalQuestions[newKey]['area'] = this.addForm.value[key];
-        //delete submitValues[key];
-        this.form.value['info'][newKey] = this.additionalQuestions[newKey];
+        event.additionalQuestions[newKey]['area'] = event['addForm'][key];
+        delete submitValues[key];
+        submitValues['info'][newKey] = event.additionalQuestions[newKey];
       }
     }
     
-    console.log(this.form.value);
+    console.log(submitValues);
     //console.log(submitValues);
-    this.developmentService.create(this.form.value);
+    this.developmentService.create(submitValues);
   }
   
   save(): void {

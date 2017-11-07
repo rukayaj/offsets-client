@@ -6,11 +6,22 @@ export class Development {
 }
 
 export class DevelopmentGeoProperty {
-  year: number;
   province: string;
   permits: number[];
-  type: string;
-  info: object;
+  use: string;
+  applicant: string;
+  application_title: string;
+  activity_description: string;
+  authority: string;
+  case_officer: string;
+  date_issued: string;
+  environmental_consultancy: string;
+  environmental_assessment_practitioner: string;
+  location_description: string;
+  reference_no: string;  
+  __str__: string;
+  geo_info: object;
+  unique_id: string;
 }
 
 export class Area {

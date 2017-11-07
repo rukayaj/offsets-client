@@ -8,9 +8,14 @@ import { DashboardComponent }  from './dashboard/dashboard.component';
 import { DevelopmentDetailComponent } from './development/development-detail.component';
 import { DevelopmentFormComponent } from './development/development-form.component';
 import { DynamicFormQuestionComponent } from './dynamic-form/dynamic-form-question.component';
+import { StatisticsComponent } from './statistics/statistics.component';
 //import { DynamicFormComponent } from './dynamic-form.component';
 import { DevelopmentService }         from './services/development.service';
 import { BGISService }         from './services/bgis.service';
+
+import { NvD3Module } from 'ng2-nvd3';
+import 'd3';
+import 'nvd3';
 
 import { AppRoutingModule }     from './app-routing.module';
 import { HttpModule } from "@angular/http";
@@ -27,6 +32,9 @@ import {NgbModule} from '@ng-bootstrap/ng-bootstrap';
 import { ReactiveFormsModule } from '@angular/forms';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 
+// Datepicker
+//import { }
+
 @NgModule({
   imports: [
     BrowserModule,
@@ -36,7 +44,10 @@ import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
     LeafletModule,
     NgbModule.forRoot(), 
     ReactiveFormsModule,
-    BrowserAnimationsModule
+    BrowserAnimationsModule,
+    NvD3Module,
+    //OverlayModule, // datepicker
+    //DatePickerModule // datepicker
   ],
   declarations: [
     AppComponent,
@@ -44,6 +55,7 @@ import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
     DevelopmentDetailComponent,
     DevelopmentFormComponent,
     DynamicFormQuestionComponent,
+    StatisticsComponent
     //DynamicFormComponent
   ],
   providers: [DevelopmentService, BGISService],

@@ -11,6 +11,7 @@ import { MultiDropdownQuestion } from '../dynamic-form/question-multidropdown';
 import { DropdownQuestion } from '../dynamic-form/question-dropdown';
 import { TextboxQuestion }  from '../dynamic-form/question-textbox';
 import { GeoJsonQuestion }  from '../dynamic-form/question-geojson';
+import { DateQuestion }  from '../dynamic-form/question-date';
 import 'rxjs/add/operator/map'
 import { Observable } from 'rxjs/Rx';
 
@@ -29,6 +30,13 @@ export class DevelopmentService {
     this.getDevelopmentQuestions().then(result => this.developmentOptions = result);
   }
   
+  getStatistics(): Promise<Object> {
+    return this.http.get(this.apiUrl + '/statistics')
+           .toPromise()
+           .then(response => response.json())
+           .catch(this.handleError);
+  }
+        
   getOffsets(devID?: number): Promise<Object> {
     let url = this.offsetUrl
     if(devID) {
@@ -107,7 +115,6 @@ export class DevelopmentService {
         let postMetadata = metadata['actions'].POST; 
         var questions = []; 
         var promises = []; 
-
         for(let md in postMetadata) {
           let item = postMetadata[md];
           if(!item['read_only']) {  
@@ -156,7 +163,7 @@ export class DevelopmentService {
         var questions = []; 
         var promises = []; 
 
-        for(let md in postMetadata) {
+        for(let md in postMetadata) { 
           let item = postMetadata[md];
           if(!item['read_only']) {  
             item['key'] = md; 
@@ -164,7 +171,9 @@ export class DevelopmentService {
             item['is_multi'] = null;
                         
             switch(item['type']) {
+              case 'string': { questions.push(new TextboxQuestion(item)); break; }
               case 'integer': { questions.push(new TextboxQuestion(item)); break; }
+              case 'date': { questions.push(new DateQuestion(item)); break; }
               case 'choice':  { questions.push(new DropdownQuestion(item)); break; }
               case 'geojson': { 
                 item['order'] = 1;
@@ -192,6 +201,14 @@ export class DevelopmentService {
         // Will this actually work for forms with more than one foreign key?
         return Promise.all(promises).then(results => results[results.length - 1]);
       })
+  }
+  
+  createOffset(offset: object): Promise<Object> {
+    return this.http
+      .post(this.offsetUrl, offset, {headers: this.headers})
+      .toPromise()
+      .then(res => res.json().data)
+      .catch(this.handleError); // TODO show server error back at the form
   }
   
   create(development: object): Promise<Development> {

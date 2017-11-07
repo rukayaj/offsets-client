@@ -1,6 +1,5 @@
-import { Component, Input, OnInit } from '@angular/core';
+import { Component, Input, OnInit, EventEmitter, Output } from '@angular/core';
 import { FormGroup }        from '@angular/forms';
-
 import { QuestionBase }              from '../dynamic-form/question-base';
 import { QuestionControlService }    from '../dynamic-form/question-control.service';
 
@@ -44,6 +43,7 @@ export class DynamicFormQuestionComponent {
   addForm: FormGroup;
   showAddForm = false;
   payLoad = '';
+  @Output() formSubmit = new EventEmitter<object>();
   
   additionalQuestions = {};
   
@@ -78,7 +78,7 @@ export class DynamicFormQuestionComponent {
     var files = event.srcElement.files;
     var reader = new FileReader();
      
-    reader.onloadend = function(e){ // Performed after file has been loaded
+    reader.onloadend = function(e) { // Performed after file has been loaded
       let geojson = reader.result;
       let polygonObj = JSON.parse(geojson);
       let polygon = L.geoJSON(polygonObj);
@@ -119,6 +119,11 @@ export class DynamicFormQuestionComponent {
     
     // Actually reading the file
     reader.readAsText(files[0]);
+  }
+  
+  
+  formSubmitF(event) {
+    this.formSubmit.emit({'form': this.form.value, 'addForm': this.addForm.value, 'additionalQuestions': this.additionalQuestions});
   }
   
   get isValid() { 

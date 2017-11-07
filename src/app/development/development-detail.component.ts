@@ -12,7 +12,8 @@ import { BGISService } from '../services/bgis.service';
 import { QuestionBase }              from '../dynamic-form/question-base';
 import { QuestionControlService }    from '../dynamic-form/question-control.service';
 
-import {NgbModal, ModalDismissReasons} from '@ng-bootstrap/ng-bootstrap';
+import {NgbModal, ModalDismissReasons, NgbModalRef} from '@ng-bootstrap/ng-bootstrap';
+
 
 @Component({
   selector: 'development-detail',
@@ -24,6 +25,7 @@ export class DevelopmentDetailComponent implements OnInit {
   @Input() development: Development;
   offsets: Object;
   objectKeys = Object.keys;
+  private modalRef:NgbModalRef;
   
   questions: QuestionBase<any>[];// = [];
 
@@ -47,7 +49,8 @@ export class DevelopmentDetailComponent implements OnInit {
     this.offsetLayers = [L.tileLayer('http://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { maxZoom: 18, attribution: '...' })];
     
     
-    this.developmentService.getDevelopmentQuestions().then(questions => {
+    this.developmentService.getOffsetQuestions().then(questions => {
+      
       this.questions = questions.sort((a, b) => a.order - b.order);
       //console.log(this.questions);
     });
@@ -55,9 +58,10 @@ export class DevelopmentDetailComponent implements OnInit {
   
   ngOnInit(): void {
     this.route.paramMap
-      .switchMap((params: ParamMap) => this.developmentService.getDevelopment(+params.get('id')))
+      .switchMap((params: ParamMap) => this.developmentService.getDevelopment(+params.get('id'))) // the + casts it to an int apparently
       .subscribe(development => { 
           var polygon = L.geoJSON(development); // This wouldn't be possible if development wasn't a valid geojson object 
+          
           let centroid = polygon.getBounds().getCenter();
           this.layers.push(polygon); //- Can't do this, must do it below... 
           this.options['center'] = centroid;
@@ -77,8 +81,7 @@ export class DevelopmentDetailComponent implements OnInit {
           
           // Used to populate the form
           this.development = development;
-          
-          //console.log(development.properties.info);
+          console.log(development.properties);
           
           // I think we don't need this any more, it was just to display a protected area
           /*this.developmentService.getAreas().then( areas => {
@@ -94,7 +97,7 @@ export class DevelopmentDetailComponent implements OnInit {
           this.developmentService.getOffsets(development['id']).then( offsets => {
             if(offsets['count'] > 0) {
               this.offsets = offsets['results'];
-              //console.log(this.offsets);
+              console.log(this.offsets);
               //console.log(JSON.stringify(this.offsets));
               let offsetPolygons = L.geoJSON(JSON.parse(JSON.stringify(this.offsets)), {
                 style: function(feature) {
@@ -127,7 +130,8 @@ export class DevelopmentDetailComponent implements OnInit {
   }
   
   open(content) {
-    this.modalService.open(content, {'size': 'lg'}).result.then((result) => {
+    this.modalRef = this.modalService.open(content, {'size': 'lg', windowClass: 'fade'});
+    this.modalRef.result.then((result) => {
       //this.closeResult = `Closed with: ${result}`;
     }, (reason) => {
       //this.closeResult = `Dismissed ${this.getDismissReason(reason)}`;
@@ -137,6 +141,39 @@ export class DevelopmentDetailComponent implements OnInit {
   save(): void {
     this.developmentService.update(this.development)
       .then(() => this.goBack());
+  }
+  
+  
+  onSubmitF(event) {
+    // additionalQuestions contains all of the additional area qs retrieved from BGIS
+    // Including status etc. We need to add area to this from what was entered on the form
+    // Then delete the submitted form value and add the original additionalQuestions
+    // A bit weird and hacky but I can't work out a better way to do this!
+    // Oh and for some reason we can't just add the additional qs to the original form
+    // Had to make a new form called addForm or else when you submit the original form the 
+    // original values get lost. WTF is all I can say.
+    //console.log(event);
+    //console.log(event['form']);
+    
+    var submitValues = event['form'];
+    submitValues['info'] = {}; // This should really come from the API... 
+    for(let key in event['addForm']) {
+      if(key.startsWith('json_')) {
+        let newKey = key.substring(5);
+        event.additionalQuestions[newKey]['area'] = event['addForm'][key];
+        delete submitValues[key];
+        submitValues['info'][newKey] = event.additionalQuestions[newKey];
+      }
+    }
+    console.log(this.development);
+    console.log(submitValues);
+    submitValues['development'] = this.development.id;
+    //console.log(submitValues);
+    var newOffset = this.developmentService.createOffset(submitValues);
+    console.log('created');
+    console.log(newOffset);
+    
+    this.modalRef.close();
   }
 }
 

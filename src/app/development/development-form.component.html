@@ -1,74 +1,7 @@
 <div class="row">
   <div class="col-12">
     <h2>Add development</h2>
-
-    <form (ngSubmit)="onSubmit()" [formGroup]="form">
-
-      <div *ngFor="let question of questions" class="form-row">
-        <div [formGroup]="form" class="form-group row">
-          <label [attr.for]="question.key" class="col-sm-2 col-form-label">{{question.label}}</label>
-
-          <div [ngSwitch]="question.controlType" class="col-sm-10">
-
-            <input *ngSwitchCase="'textbox'" [formControlName]="question.key"
-                    [id]="question.key" [type]="question.type" class="form-control" >
-                    
-            <select [id]="question.key" *ngSwitchCase="'dropdown'" [formControlName]="question.key" class="form-control" >
-              <option *ngFor="let opt of question.choices" [value]="opt.value">{{opt.display_name}}</option>
-            </select>
-            
-            <select [id]="question.key" *ngSwitchCase="'multidropdown'" multiple [formControlName]="question.key" class="form-control" >
-              <option *ngFor="let opt of question.choices" [value]="opt.value">{{opt.display_name}}</option>
-            </select>
-              
-            <label class="custom-file" *ngSwitchCase="'geojson'">
-              <input type="file" [id]="question.key" class="custom-file-input" (change)="onChange($event, $layers, $options)">
-              <span class="custom-file-control"></span>
-              <div *ngIf="showLeaflet" class="alert alert-warning">Geojson file plotted on map below. Upload a new file to override. </div>
-            </label>
-            
-            <small class="form-text text-muted">{{question.help_text}}</small>
-            <small class="form-text text-muted alert alert-danger" *ngIf="!isValid">{{question.label}} is required</small>
-          </div> 
-        </div>
-          
-        <div *ngIf="question.controlType=='geojson'&&showLeaflet">
-          <div class="row"><div [@fadeInOut] class="col-sm-10 offset-sm-2">
-            <div leaflet style="height: 300px;" [leafletOptions]="options" [leafletLayers]="layers" [leafletCenter]="center"></div>
-          </div></div>
-          <hr>
-          <div class="row">
-            <h5>Fill in the number of hectares for each area. <small>Areas have been derived from the BGIS website.</small></h5>
-          </div>
-        </div>
-      </div>
-    </form>
-    
-
-    <form (ngSubmit)="onSubmit()" [formGroup]="addForm" *ngIf="addFormQuestions.length>1  ">
-    
-    <hr>
-      <div *ngFor="let question of addFormQuestions" class="form-row">
-        <div [formGroup]="addForm" class="form-group row">
-          <label [attr.for]="question.key" class="col-sm-2 col-form-label">{{question.label}}</label>
-
-          <div [ngSwitch]="question.controlType" class="col-sm-10">
-
-            <input *ngSwitchCase="'textbox'" [formControlName]="question.key"
-                    [id]="question.key" [type]="question.type" class="form-control" >
-                    
-            <small class="form-text text-muted">{{question.help_text}}</small>
-            <small class="form-text text-muted alert alert-danger" *ngIf="!isValid">{{question.label}} is required</small>
-          </div> 
-        </div>
-      </div>
-
-      <div class="form-row">
-        <div class="col-sm-10 offset-sm-2">
-          <button type="submit" class="btn btn-primary">Save</button>
-        </div>
-      </div>
-    </form>
+    <dynamic-form *ngIf="questions" [questions]="questions"  (formSubmit)="onSubmitF($event)"></dynamic-form>
     
   </div>
 </div>

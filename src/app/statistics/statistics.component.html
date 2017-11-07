@@ -1,0 +1,12 @@
+<div *ngIf="data">
+  <div class="row">
+    <ng-container *ngFor="let datum of data; let i = index">
+      <div [ngClass]="{'col-md-6': datum[0].key!='Number of vegetation types (developments)', 'col-md-12': datum[0].key=='Number of vegetation types (developments)'}">
+        <h4>{{ datum[0].key }}</h4>
+        <div style="display: block; clear: both; overflow: auto;">
+          <nvd3 [options]="options[i]" [data]="datum"></nvd3>
+        </div>
+      </div>
+    </ng-container>
+  </div>
+</div>    
